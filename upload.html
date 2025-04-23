@@ -1,0 +1,29 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Upload</title>
+    <link rel="stylesheet" href="../style/repos.css">
+</head>
+<body>
+        <header>
+        <h1>Admin - Uploaded Images</h1>
+        </header>
+    <main>
+        <section class="gallery-container">
+            <div id="admin-gallery" class="gallery-grid">
+                <!-- Images will be dynamically loaded here -->
+            </div>
+        </section>
+        <section class="upload-container">
+            <h2>Upload New Image</h2>
+            <form id="upload-form">
+                <input type="file" id="image-file" accept="image/*" required>
+                <button type="submit">Upload</button>
+            </form>
+            <p id="upload-status"></p>
+        </section>
+    </main>
+    <script src="upload.js"></script>
+</body>
+</html>

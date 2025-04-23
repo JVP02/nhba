@@ -1,0 +1,36 @@
+.upload-container {
+    margin: 20px auto;
+    max-width: 600px;
+    text-align: center;
+}
+
+#upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+#upload-form input[type="file"] {
+    padding: 5px;
+}
+
+#upload-form button {
+    background-color: #07a359;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#upload-form button:hover {
+    background-color: #055a33;
+}
+
+#upload-status {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #555;
+}
