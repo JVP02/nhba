@@ -16,11 +16,11 @@ document.addEventListener("DOMContentLoaded", function () {
             data.forEach(file => {
                 if (file.type === "file" && /\.(jpg|jpeg|png|gif)$/i.test(file.name)) {
                     const card = document.createElement("div");
-                    card.className = "gallery-card";
+                    card.className = "admingallery-card";
 
                     card.innerHTML = `
                         <img src="${file.download_url}" alt="${file.name}">
-                        <div class="gallery-card-content">
+                        <div class="admingallery-card-content">
                             <h3>${file.name}</h3>
                             <p>No description available.</p>
                             <small>Unknown date</small>
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
             fetch(uploadUrl, {
                 method: "PUT",
                 headers: {
-                    "Authorization": "Bearer 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", // Replace with your fine-grained token
+                    "Authorization": "Bearer YOUR_FINE_GRAINED_PERSONAL_ACCESS_TOKEN", // Replace with a valid token
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
