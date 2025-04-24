@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
             fetch(uploadUrl, {
                 method: "PUT",
                 headers: {
-                    "Authorization": "Bearer YOUR_FINE_GRAINED_PERSONAL_ACCESS_TOKEN", // Replace with a valid token
+                    "Authorization": "Bearer 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", // Replace with a valid token
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
