@@ -1,5 +1,11 @@
 <!-- filepath: c:\xampp\htdocs\nhb\admin\index.php -->
 <?php
+session_start();
+if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
+    header("Location: login.php");
+    exit;
+}
+
 // Database connection
 $host = 'localhost';
 $username = 'root';
@@ -13,12 +19,42 @@ if ($conn->connect_error) {
 }
 
 // Fetch data for dashboard
-$totalUploads = $conn->query("SELECT COUNT(*) AS total FROM uploads")->fetch_assoc()['total'];
+$totalUploads = $conn->query("SELECT COUNT(*) AS total FROM community_update")->fetch_assoc()['total'];
 $activeUsers = $conn->query("SELECT COUNT(*) AS total FROM users")->fetch_assoc()['total'];
 $pendingApprovals = 5; // Example static value
 
 // Fetch recent uploads
-$recentUploads = $conn->query("SELECT * FROM uploads ORDER BY uploaded_at DESC LIMIT 5");
+$query = "SELECT * FROM community_update ORDER BY date DESC LIMIT 5";
+$result = $conn->query($query);
+
+$recentUploads = [];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $recentUploads[] = $row;
+    }
+}
+
+// Fetch the total number of community updates
+$query = "SELECT COUNT(*) AS total_updates FROM community_update";
+$result = $conn->query($query);
+
+if ($result) {
+    $row = $result->fetch_assoc();
+    $totalUpdates = $row['total_updates'];
+} else {
+    $totalUpdates = 0;
+}
+
+// Fetch the latest community updates
+$query = "SELECT * FROM community_update ORDER BY date DESC LIMIT 5";
+$result = $conn->query($query);
+
+$updates = [];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $updates[] = $row;
+    }
+}
 
 // Fetch users
 $users = $conn->query("SELECT * FROM users");
@@ -33,21 +69,21 @@ $users = $conn->query("SELECT * FROM users");
 </head>
 <body>
     <div class="admin-dashboard">
-        <!-- Sidebar -->
-        <aside class="admin-sidebar">
-            <h2>Admin Panel</h2>
-            <nav>
-                <ul>
-                    <li><a href="#dashboard">Dashboard</a></li>
-                    <li><a href="#uploads">Uploads</a></li>
-                    <li><a href="#users">User Management</a></li>
-                    <li><a href="#settings">Settings</a></li>
-                </ul>
-            </nav>
-        </aside>
+        <?php include 'comp/sidebar.php'; ?>
+        <main>
+            <header>
+                <div class="profile-menu" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
+                    <span>Welcome, <?php echo htmlspecialchars($_SESSION['admin_name']); ?></span>
+                    <div class="dropdown">
+                        <button class="dropdown-button">Profile</button>
+                        <div class="dropdown-content">
+                            <a href="profile.php">View Profile</a>
+                            <a href="logout.php">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
 
-        <!-- Main Content -->
-        <main class="admin-main">
             <section id="dashboard" class="dashboard-section">
                 <h2>Dashboard Overview</h2>
                 <div class="stats-grid">
@@ -63,18 +99,28 @@ $users = $conn->query("SELECT * FROM users");
                         <h3>Pending Approvals</h3>
                         <p id="pending-approvals"><?php echo $pendingApprovals; ?></p>
                     </div>
+                    <div class="stat-card">
+                        <h3>Total Community Updates</h3>
+                        <p><?php echo $totalUpdates; ?></p>
+                    </div>
                 </div>
             </section>
 
-            <section id="uploads" class="uploads-section">
-                <h2>Recent Uploads</h2>
-                <div class="uploads-grid">
-                    <?php while ($upload = $recentUploads->fetch_assoc()): ?>
-                        <div class="upload-card">
-                            <img src="<?php echo $upload['url']; ?>" alt="<?php echo $upload['name']; ?>">
-                            <p><?php echo $upload['name']; ?></p>
+            <section id="recent-updates" class="recent-updates-section">
+                <h2>Recent Community Updates</h2>
+                <div class="recent-updates-list">
+                    <?php foreach ($updates as $update): ?>
+                        <div class="update-item">
+                            <div class="update-image">
+                                <img src="<?php echo isset($update['image_url']) ? htmlspecialchars($update['image_url']) : ''; ?>" alt="<?php echo isset($update['title']) ? htmlspecialchars($update['title']) : 'Untitled'; ?>">
+                            </div>
+                            <div class="update-content">
+                                <h3><?php echo isset($update['title']) ? htmlspecialchars($update['title']) : 'Untitled'; ?></h3>
+                                <p><?php echo isset($update['description']) ? htmlspecialchars($update['description']) : 'No description available.'; ?></p>
+                                <small><?php echo isset($update['date']) ? htmlspecialchars($update['date']) : 'Unknown date'; ?></small>
+                            </div>
                         </div>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 </div>
             </section>
 

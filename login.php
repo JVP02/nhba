@@ -24,11 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result->num_rows > 0) {
         $admin = $result->fetch_assoc();
-        if (password_verify($password, $admin['password'])) {
+        if ($password === $admin['password']) { // Compare plain-text passwords
             // Successful login
             $_SESSION['admin_logged_in'] = true;
             $_SESSION['admin_id'] = $admin['id'];
             $_SESSION['admin_name'] = $admin['name'];
+            $_SESSION['admin_email'] = $admin['email'];
             header("Location: index.php");
             exit;
         } else {

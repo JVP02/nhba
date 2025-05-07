@@ -1,7 +1,12 @@
 <?php
 header("Content-Type: application/json");
 
-// Database connection
+session_start();
+if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
+    echo json_encode(["success" => false, "message" => "Unauthorized access."]);
+    exit;
+}
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -14,15 +19,14 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Get JSON input
-$data = json_decode(file_get_contents("php://input"), true);
+// Validate input
+if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $id = intval($_GET['id']);
 
-if (isset($data['id'])) {
-    $id = $conn->real_escape_string($data['id']);
-
-    $query = "DELETE FROM users WHERE id='$id'";
+    // Delete the user from the `users` table
+    $query = "DELETE FROM users WHERE id = $id";
     if ($conn->query($query)) {
-        echo json_encode(["success" => true]);
+        echo json_encode(["success" => true, "message" => "User deleted successfully."]);
     } else {
         echo json_encode(["success" => false, "message" => "Failed to delete user."]);
     }

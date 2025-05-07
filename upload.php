@@ -29,7 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Store file path and metadata in the `community_update` table
         $query = "INSERT INTO community_update (title, description, image_url, date) VALUES ('$title', '$description', '$uploadFile', NOW())";
         if ($conn->query($query)) {
-            $successMessage = "Image uploaded and saved successfully!";
+            // Redirect to the same page to prevent form resubmission
+            header("Location: upload.php?success=1");
+            exit;
         } else {
             $errorMessage = "Failed to save image to the database: " . $conn->error;
         }
@@ -52,61 +54,45 @@ $result = $conn->query($query);
 </head>
 <body>
     <div class="admin-dashboard">
-        <!-- Sidebar -->
-        <aside class="admin-sidebar">
-            <h2>Admin Panel</h2>
-            <nav>
-                <ul>
-                    <li><a href="index.php">Dashboard</a></li>
-                    <li><a href="upload.php" class="active">Upload</a></li>
-                    <li><a href="gallery.php">Gallery</a></li>
-                    <li><a href="settings.php">Settings</a></li>
-                </ul>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
+        <?php include 'comp/sidebar.php'; ?>
         <main class="admin-main">
             <section class="upload-section">
                 <h2>Upload Image</h2>
                 <div class="upload-card">
-                    <?php if (isset($successMessage)): ?>
-                        <p class="success-message"><?php echo $successMessage; ?></p>
+                    <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+                        <p class="success-message">Image uploaded successfully!</p>
                     <?php elseif (isset($errorMessage)): ?>
                         <p class="error-message"><?php echo $errorMessage; ?></p>
                     <?php endif; ?>
                     <form id="upload-form" method="POST" action="" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label for="title">Title</label>
-                            <input type="text" id="title" name="title" required>
+                        <div class="form-row">
+                            <input type="text" id="title" name="title" placeholder="Enter Title" required>
                         </div>
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea id="description" name="description" required></textarea>
+                        <div class="form-row">
+                            <textarea id="description" name="description" placeholder="Enter Description" required></textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="image">Select Image</label>
+                        <div class="form-row">
                             <input type="file" id="image" name="image" accept="image/*" required>
                         </div>
-                        <button type="submit" class="upload-button">Upload</button>
+                        <div class="form-row">
+                            <button type="submit" class="upload-button">Upload</button>
+                        </div>
                     </form>
                 </div>
             </section>
 
             <section class="gallery-section">
                 <h2>Gallery</h2>
-                <div id="admin-gallery" class="gallery-grid">
+                <div class="modern-list">
                     <?php while ($row = $result->fetch_assoc()): ?>
-                        <div class="gallery-card">
-                            <img src="<?php echo $row['image_url']; ?>" alt="<?php echo $row['title']; ?>">
-                            <div class="gallery-card-content">
-                                <h3><?php echo $row['title']; ?></h3>
-                                <p><?php echo $row['description']; ?></p>
-                                <small><?php echo $row['date']; ?></small>
+                        <div class="list-item">
+                            <div class="list-image">
+                                <img src="<?php echo htmlspecialchars($row['image_url']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?>">
                             </div>
-                            <div class="gallery-card-actions">
-                                <button class="edit-button" onclick="editImage(<?php echo $row['id']; ?>)">Edit</button>
-                                <button class="delete-button" onclick="deleteImage(<?php echo $row['id']; ?>)">Delete</button>
+                            <div class="list-content">
+                                <h3><?php echo htmlspecialchars($row['title']); ?></h3>
+                                <p><?php echo htmlspecialchars($row['description']); ?></p>
+                                <small><?php echo htmlspecialchars($row['date']); ?></small>
                             </div>
                         </div>
                     <?php endwhile; ?>
