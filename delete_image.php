@@ -10,36 +10,28 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if (isset($_GET['id'])) {
-    $id = intval($_GET['id']);
+$image_id = $_GET['id'] ?? null;
 
-    // Fetch the image file path
-    $query = "SELECT image_url FROM community_update WHERE id = $id";
+if ($image_id) {
+    $query = "SELECT file_path FROM images WHERE id = '$image_id'";
     $result = $conn->query($query);
 
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $imagePath = $row['image_url'];
+    if ($result && $row = $result->fetch_assoc()) {
+        $filePath = $row['file_path'];
 
-        // Delete the image file from the server
-        if (file_exists($imagePath)) {
-            unlink($imagePath);
+        // Delete the file from the server
+        if (file_exists($filePath)) {
+            unlink($filePath);
         }
 
-        // Delete the record from the `community_update` table
-        $query = "DELETE FROM community_update WHERE id = $id";
+        // Delete the record from the database
+        $query = "DELETE FROM images WHERE id = '$image_id'";
         if ($conn->query($query)) {
-            header("Location: upload.php?message=Image deleted successfully");
+            header("Location: " . $_SERVER['HTTP_REFERER']);
             exit;
-        } else {
-            echo "Error deleting record from community_update table: " . $conn->error;
         }
-    } else {
-        echo "Image not found.";
     }
-} else {
-    echo "Invalid request.";
 }
 
-$conn->close();
+die("Failed to delete image.");
 ?>

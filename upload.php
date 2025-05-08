@@ -57,8 +57,8 @@ $result = $conn->query($query);
         <?php include 'comp/sidebar.php'; ?>
         <main class="admin-main">
             <section class="upload-section">
-                <h2>Upload Image</h2>
-                <div class="upload-card">
+                <h2>Upload Community Update</h2>
+                <div class="upload-card modern-card">
                     <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
                         <p class="success-message">Image uploaded successfully!</p>
                     <?php elseif (isset($errorMessage)): ?>
@@ -66,16 +66,19 @@ $result = $conn->query($query);
                     <?php endif; ?>
                     <form id="upload-form" method="POST" action="" enctype="multipart/form-data">
                         <div class="form-row">
-                            <input type="text" id="title" name="title" placeholder="Enter Title" required>
+                            <label for="title"><i class="fas fa-heading"></i> Title</label>
+                            <input type="text" id="title" name="title" placeholder="Enter title" required>
                         </div>
                         <div class="form-row">
-                            <textarea id="description" name="description" placeholder="Enter Description" required></textarea>
+                            <label for="description"><i class="fas fa-align-left"></i> Description</label>
+                            <textarea id="description" name="description" placeholder="Enter a brief description" required></textarea>
                         </div>
                         <div class="form-row">
+                            <label for="image"><i class="fas fa-image"></i> Upload Image</label>
                             <input type="file" id="image" name="image" accept="image/*" required>
                         </div>
                         <div class="form-row">
-                            <button type="submit" class="upload-button">Upload</button>
+                            <button type="submit" class="upload-button"><i class="fas fa-upload"></i> Upload</button>
                         </div>
                     </form>
                 </div>
@@ -93,6 +96,10 @@ $result = $conn->query($query);
                                 <h3><?php echo htmlspecialchars($row['title']); ?></h3>
                                 <p><?php echo htmlspecialchars($row['description']); ?></p>
                                 <small><?php echo htmlspecialchars($row['date']); ?></small>
+                            </div>
+                            <div class="list-actions">
+                                <a href="manage_upload.php?upload_id=<?php echo $row['id']; ?>" class="manage-button">Manage</a>
+                                <a href="delete_upload.php?id=<?php echo $row['id']; ?>" class="delete-button" onclick="return confirm('Are you sure you want to delete this upload?');">Delete</a>
                             </div>
                         </div>
                     <?php endwhile; ?>
